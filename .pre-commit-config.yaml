@@ -15,3 +15,10 @@ repos:
     rev: v0.1.17
     hooks:
       - id: helmlint
+  - repo: local
+    hooks:
+      - id: gen_diagram
+        files: diagram_as_code.py
+        name: generate diagrams
+        entry: python diagram_as_code
+        language: system
