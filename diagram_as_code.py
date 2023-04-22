@@ -21,7 +21,7 @@ with Diagram(
     with Cluster("K8s"):
         with Cluster("Metadata zone"):
             hive = Hive("Hive Metastore")
-            psql = PostgreSQL()
+            psql = PostgreSQL("DB")
 
         with Cluster("Computing"):
             trino = Custom("", "../assets/trino.png")
@@ -30,6 +30,6 @@ with Diagram(
         [iceberg, hive, bq, gcs] >> trino
 
     with Cluster("Serving"):
-        dashboard = Superset("Superset")
+        dashboard = Superset("Dashboard")
         feast = Custom("Feature Store", "../assets/feast.png")
         trino >> [dashboard, feast]

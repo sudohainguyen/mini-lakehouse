@@ -20,5 +20,5 @@ repos:
       - id: gen_diagram
         files: diagram_as_code.py
         name: generate diagrams
-        entry: python diagram_as_code
+        entry: python diagram_as_code.py
         language: system
