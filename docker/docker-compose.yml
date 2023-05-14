@@ -10,32 +10,66 @@ services:
     networks:
       - trino
 
-  mariadb:
-    image: 'mariadb:latest'
-    hostname: mariadb
+  postgresdb:
+    image: 'postgres:15.2'
+    hostname: postgresdb
     ports:
-      - '3306:3306'
+      - '5432:5432'
     environment:
-      MYSQL_ROOT_PASSWORD: admin
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
-      MYSQL_DATABASE: metastore_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: metastore_db
     volumes:
-      - ./mariadb-data:/var/lib/mysql
+      - ./postgres-data:/var/lib/postgresql/data
     networks:
       - trino
 
+  # hive-metastore:
+  #   hostname: hive-metastore
+  #   image: 'bde2020/hive-metastore-postgresql:3.1.0'
+  #   ports:
+  #     - '9083:9083'
+  #   volumes:
+  #     - ./conf/metastore-site.xml:/opt/apache-hive-metastore-3.0.0-bin/conf/metastore-site.xml:ro
+  #   environment:
+  #     METASTORE_DB_HOSTNAME: postgresdb
+  #   depends_on:
+  #     - postgresdb
+  #   networks:
+  #     - trino
+
   hive-metastore:
     hostname: hive-metastore
-    image: 'bitsondatadev/hive-metastore:latest'
+    image: 'starburstdata/hive:3.1.2-e.18'
     ports:
-      - '9083:9083'
-    volumes:
-      - ./conf/metastore-site.xml:/opt/apache-hive-metastore-3.0.0-bin/conf/metastore-site.xml:ro
+      - '9083:9083' # Metastore Thrift
     environment:
-      METASTORE_DB_HOSTNAME: mariadb
+      HIVE_METASTORE_DRIVER: org.postgresql.Driver
+      HIVE_METASTORE_JDBC_URL: jdbc:postgresql://postgresdb:5432/metastore_db
+      HIVE_METASTORE_USER: admin
+      HIVE_METASTORE_PASSWORD: admin
+      HIVE_METASTORE_WAREHOUSE_DIR: s3://datalake/
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: minio
+      S3_SECRET_KEY: minio123
+      S3_PATH_STYLE_ACCESS: "true"
+      REGION: ""
+      GOOGLE_CLOUD_KEY_FILE_PATH: ""
+      HIVE_METASTORE_USERS_IN_ADMIN_ROLE: "admin"
+      AZURE_ADL_CLIENT_ID: ""
+      AZURE_ADL_CREDENTIAL: ""
+      AZURE_ADL_REFRESH_URL: ""
+      AZURE_ABFS_STORAGE_ACCOUNT: ""
+      AZURE_ABFS_ACCESS_KEY: ""
+      AZURE_WASB_STORAGE_ACCOUNT: ""
+      AZURE_ABFS_OAUTH: ""
+      AZURE_ABFS_OAUTH_TOKEN_PROVIDER: ""
+      AZURE_ABFS_OAUTH_CLIENT_ID: ""
+      AZURE_ABFS_OAUTH_SECRET: ""
+      AZURE_ABFS_OAUTH_ENDPOINT: ""
+      AZURE_WASB_ACCESS_KEY: ""
     depends_on:
-      - mariadb
+      - postgresdb
     networks:
       - trino
 
@@ -67,9 +101,10 @@ services:
       /bin/sh -c "
       until (/usr/bin/mc config host add minio http://minio:9000 minio minio123) do echo '...waiting...' && sleep 1; done;
       /usr/bin/mc rm -r --force minio/iris;
-      /usr/bin/mc mb minio/iris;
-      /usr/bin/mc policy set public minio/iris;
-      /usr/bin/mc cp /data/iris.parq minio/iris/iris.parq;
+      /usr/bin/mc rm -r --force minio/datalake;
+      /usr/bin/mc mb minio/datalake;
+      /usr/bin/mc policy set public minio/datalake;
+      /usr/bin/mc cp /data/iris.parq minio/datalake/iris/iris.parq;
       exit 0;
       "
     networks:
@@ -77,8 +112,21 @@ services:
     volumes:
       - ./data/iris.parq:/data/iris.parq
 
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: cloudbeaver
+    # restart: always
+    ports:
+      - 8978:8978
+    volumes:
+      - cloudbeaver:/opt/cloudbeaver/workspace
+    networks:
+      - trino
+
 volumes:
   minio-data:
+    driver: local
+  cloudbeaver:
     driver: local
 
 networks:
