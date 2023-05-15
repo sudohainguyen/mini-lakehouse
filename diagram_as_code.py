@@ -1,7 +1,6 @@
 from diagrams import Cluster, Diagram
 from diagrams.custom import Custom
 from diagrams.gcp.analytics import Bigquery
-from diagrams.gcp.storage import GCS
 from diagrams.onprem.analytics import Hive, Superset
 from diagrams.onprem.database import PostgreSQL
 
@@ -13,23 +12,25 @@ with Diagram(
     direction="LR",
 ):
     with Cluster("Data Source"):
-        gcs = GCS("Google Cloud Storage")
-        iceberg = Custom("Iceberg", "../assets/iceberg.png")
+        minio = Custom("Minio", "../assets/minio.png")
         bq = Bigquery("BigQuery tables")
-        gcs - iceberg
+        iceberg = Custom("Iceberg tables", "../assets/iceberg.png")
+        hive = Hive("Hive tables")
+        hive - minio - iceberg
 
     with Cluster("K8s"):
         with Cluster("Metadata zone"):
-            hive = Hive("Hive Metastore")
+            hive_metastore = Hive("Hive Metastore")
             psql = PostgreSQL("DB")
 
         with Cluster("Computing"):
             trino = Custom("", "../assets/trino.png")
 
-        psql >> hive
-        [iceberg, hive, bq, gcs] >> trino
+        psql >> hive_metastore
+        minio >> trino
+        [hive_metastore, bq] >> trino
 
     with Cluster("Serving"):
         dashboard = Superset("Dashboard")
-        feast = Custom("Feature Store", "../assets/feast.png")
-        trino >> [dashboard, feast]
+        feature_store = Custom("Feature Store", "../assets/feast.png")
+        trino >> [dashboard, feature_store]
