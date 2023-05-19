@@ -12,12 +12,10 @@ docker-compose up
 ## Hive
 
 ```sql
-USE hive;
-
-CREATE SCHEMA IF NOT EXISTS samples
+CREATE SCHEMA IF NOT EXISTS hive.samples
     WITH (location = 's3a://datalake/');
 
-CREATE TABLE IF NOT EXISTS hive.iris.iris_parque
+CREATE TABLE IF NOT EXISTS hive.samples.iris_parque
 (
     sepal_length DOUBLE,
     sepal_width  DOUBLE,
@@ -32,12 +30,10 @@ WITH (external_location = 's3a://datalake/iris/',
 ## Iceberg
 
 ```sql
-USE iceberg;
+CREATE SCHEMA IF NOT EXISTS iceberg.samples
+    WITH (location = 's3a://datalake/iceberg');
 
-CREATE SCHEMA IF NOT EXISTS samples
-    WITH (location = 's3a://datalake/');
-
-CREATE TABLE IF NOT EXISTS iceberg.iris.iris_parquet
+CREATE TABLE IF NOT EXISTS iceberg.samples.iris_iceberg
 (
     sepal_length DOUBLE,
     sepal_width  DOUBLE,
@@ -45,7 +41,7 @@ CREATE TABLE IF NOT EXISTS iceberg.iris.iris_parquet
     petal_width  DOUBLE,
     class        VARCHAR
 )
-WITH (location = 's3a://datalake/iris-iceberg', format = 'PARQUET');
+WITH (location = 's3a://datalake/iceberg/iris', format = 'PARQUET');
 ```
 
 ## Load from Hive table.
