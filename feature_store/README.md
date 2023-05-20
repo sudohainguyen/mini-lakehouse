@@ -17,5 +17,5 @@ export TRINO_USER=admin && feast apply
 ```
 
 ### Run feature retrieval job
-- Go through script `prepare_entity.sql` to create entity table on Trino.
+- Go through script [prepare_entity.sql](../sql/prepare_entity.sql) to create entity table on Trino.
 - Explore notebook [here](demo.ipynb)
