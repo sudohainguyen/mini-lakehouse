@@ -1,0 +1,14 @@
+project: feature_repo
+registry: data/registry.db
+provider: local
+offline_store:
+  type: feast.infra.offline_stores.contrib.trino_offline_store.trino.TrinoOfflineStore
+  host: localhost
+  port: 8080
+  catalog: iceberg
+  connector:
+    type: iceberg
+    file_format: parquet
+online_store:
+  path: data/online_store.db
+entity_key_serialization_version: 2
