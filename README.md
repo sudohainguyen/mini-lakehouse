@@ -22,5 +22,5 @@ Go to [docker/README.md](docker/README.md)
 - [x] Deploy Trino cluster with 2 workers
 - [x] Connect Trino to BQ (wont do)
 - [x] Replace GCS with MinIO
-- [ ] Connect Trino to Feast
+- [x] Connect Trino to Feast ([demo](./feature_store/demo.ipynb))
 - [ ] Deploy Superset dashboard to serve data
