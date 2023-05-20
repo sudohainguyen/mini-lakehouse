@@ -7,6 +7,15 @@ Build your data lakehouse at home with k8s and helm
 ![Architecture Diagram](imgs/diagram.png)
 
 
+## Guides
+
+### For docker-based setup
+
+Go to [docker/README.md](docker/README.md)
+
+### For k8s-based setup
+(TBD)
+
 ## Roadmap
 
 - [x] Deploy Hive metastore
