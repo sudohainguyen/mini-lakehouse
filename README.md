@@ -1,6 +1,6 @@
 # Mini Data Lakehouse
 
-Build your data lakehouse at home with k8s and helm
+Build your data lakehouse at home, with open source components to power machine learning feature store and data visualization.
 
 ## General Architecture
 
