@@ -1,51 +1,25 @@
 # Quickstart
 
+## Start components
 ```shell
 docker-compose up
 ```
 
-## Run Trino
+## Test things working
+
+1. Go to http://localhost:8978 and add trino connection
+2. Go through 2 scripts in turn `hive_iris.sql` and `iceberg_iris.sql`.
+
+If no error occurs, your trino cluster is ready.
+
+## Create a ML Feature table
+
+1. Create the table with DDL `station_feature_table.sql`
+2. Run query `station_feature.sql` to aggregate data and insert to target feature table.
+3. Verify the data is inserted to the table by running `select * from iceberg.samples.station_feat_30d`
+
+## Clean up
+
 ```shell
-./trino-cli-xxx-executable.jar --server http://localhost:8080
-```
-
-## Hive
-
-```sql
-CREATE SCHEMA IF NOT EXISTS hive.samples
-    WITH (location = 's3a://datalake/');
-
-CREATE TABLE IF NOT EXISTS hive.samples.iris_parque
-(
-    sepal_length DOUBLE,
-    sepal_width  DOUBLE,
-    petal_length DOUBLE,
-    petal_width  DOUBLE,
-    class        VARCHAR
-)
-WITH (external_location = 's3a://datalake/iris/',
-    format = 'PARQUET');
-```
-
-## Iceberg
-
-```sql
-CREATE SCHEMA IF NOT EXISTS iceberg.samples
-    WITH (location = 's3a://datalake/iceberg');
-
-CREATE TABLE IF NOT EXISTS iceberg.samples.iris_iceberg
-(
-    sepal_length DOUBLE,
-    sepal_width  DOUBLE,
-    petal_length DOUBLE,
-    petal_width  DOUBLE,
-    class        VARCHAR
-)
-WITH (location = 's3a://datalake/iceberg/iris', format = 'PARQUET');
-```
-
-## Load from Hive table.
-
-```sql
-insert into iceberg.samples.iris (select * from hive.samples.iris_parquet);
+docker-compose down
 ```
